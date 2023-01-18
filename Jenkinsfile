@@ -1,38 +1,31 @@
 pipeline {
-        agent {
+  // "Top-level" agent is assigned to docker agents via Jenkins pipeline configuration
+  agent none
+
+  stages {
+    stage('Docker node test') {
+      agent {
         docker {
-          // Set both label and image
-          label 'docker'
           image 'node:7-alpine'
           args '--name docker-node' // list any args
         }
-    } 
-  environment {
-    DASTARDLY_TARGET_URL='https://ginandjuice.shop/'
-    IMAGE_WITH_TAG='public.ecr.aws/portswigger/dastardly:latest'
-    JUNIT_TEST_RESULTS_FILE='dastardly-report.xml'
-  }
-  stages {
-    stage ("Docker Pull Dastardly from Burp Suite container image") {
+      }
       steps {
-        sh 'docker pull ${IMAGE_WITH_TAG}'
+        // Steps run in node:7-alpine docker container on docker agent
+        sh 'node --version'
       }
     }
-    stage ("Docker run Dastardly from Burp Suite Scan") {
-      steps {
-        cleanWs()
-        sh '''
-          docker run --rm --user $(id -u) -v ${WORKSPACE}:${WORKSPACE}:rw \
-          -e DASTARDLY_TARGET_URL=${DASTARDLY_TARGET_URL} \
-          -e DASTARDLY_OUTPUT_FILE=${WORKSPACE}/${JUNIT_TEST_RESULTS_FILE} \
-          ${IMAGE_WITH_TAG}
-        '''
+    
+    stage('Docker maven test') {
+      agent {
+        docker {
+          image 'maven:3-alpine'
+        }
       }
-    }
-  }
-  post {
-    always {
-      junit testResults: "${JUNIT_TEST_RESULTS_FILE}", skipPublishingChecks: true
+      steps {
+        // Steps run in maven:3-alpine docker container on docker agent
+        sh 'mvn --version'
+      }
     }
   }
 }
