@@ -1,9 +1,11 @@
 pipeline {
-         agent {
-    docker {
-      image 'node:lts-buster-slim'
-      args '-p 8989:8989'
-    }
+        agent {
+        docker {
+          // Set both label and image
+          label 'docker'
+          image 'node:7-alpine'
+          args '--name docker-node' // list any args
+        }
     } 
   environment {
     DASTARDLY_TARGET_URL='https://ginandjuice.shop/'
