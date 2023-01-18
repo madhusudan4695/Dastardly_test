@@ -1,6 +1,5 @@
 // Jenkinsfile (Declarative Pipeline) for integration of Dastardly, from Burp Suite.
 
-
 pipeline {
     agent any
     stages {
