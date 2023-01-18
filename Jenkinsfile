@@ -1,6 +1,4 @@
 pipeline {
-  agent 
-     {
          agent {
     docker {
       image 'node:lts-buster-slim'
